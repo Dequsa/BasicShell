@@ -1,0 +1,12 @@
+1. load config files
+
+2. do the shell things like read think execute
+
+3. terminate exit and clear everything
+
+
+---main loop---
+
+1. read stdin
+2. parse it
+3. execute command like "ls"
