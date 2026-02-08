@@ -1,7 +1,8 @@
 #include "BasicShell.h"
 
-int main(int argv, char *argc[])
+int main(int argc, char *argv[])
 {
-  BasicShell Shell(argc[1]); 
+  BasicShell Shell(argv[1]);
+  Shell.Run();
   return 0;
 }

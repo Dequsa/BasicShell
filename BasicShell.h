@@ -33,14 +33,14 @@ public:
     {
       // tell user how this works
     }
-    // load config files
-    //
-    //
-    // start the loop of working right
-    Listner();
   }
   ~BasicShell()
   {
+  }
+
+  void Run()
+  {
+    Listner();
   }
 
 private:
@@ -49,11 +49,13 @@ private:
   std::string buffer;
   std::vector<std::string> arguments; // command argument
   std::vector<std::string> saved_buffers; // for saving buffer to use upper arrow or down arrow to navigate the saved saved_buffers
-                                          //
+  int status;
+
   // umap of string : functioncall that accepts vector of strings e.g: ls -a
   std::unordered_map<std::string, CommandFunctions> shell_functions = {
-    {"ls", ShellCommands::ListFiles}
-  }; 
+    {"ls", ListFilesFunctions::ListFiles},
+    {"exit", [this](const std::vector<std::string>&placeholder){status = 0;}}
+  };
 
   void DisplayHelpInfo()
   {
@@ -68,6 +70,7 @@ private:
     if (buffer == "")
     {
       DisplayHelpInfo();
+      buffer = "DEQUSA";
       return;
     }
   }
@@ -103,7 +106,7 @@ private:
     
   void Listner()
   {
-    int status = 1; // 1 working 0 exit
+    status = 1; // 1 working 0 exit
     do
     {
     TakeUserInput();
