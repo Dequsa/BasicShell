@@ -59,26 +59,16 @@ if (fork() == 0) {
 }
 ```
 
-```
-
 🚀 Getting Started
 Build
-```
-
 ```Bash
 
 g++ *.cpp -o BasicShell -std=c++17
 ```
-
-```
 Run
-```
-
 ```Bash
 
 ./BasicShell
-```
-
 ```
 🎯 Roadmap
 
@@ -95,4 +85,3 @@ Run
     [ ] Background execution (&)
 
 Developed by dequsa.
-```
