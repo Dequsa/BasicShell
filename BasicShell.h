@@ -5,9 +5,12 @@
 #include <unordered_map>
 #include <sstream>
 #include <iterator>
+#include <signal.h>
 #include "ShellCommands.h"
+#include "TaskManager.h"
 
 using CommandFunctions = std::function<void(const std::vector<std::string>&)>; 
+namespace fs = std::filesystem;
 
 namespace CheckFunctions
 {
@@ -50,11 +53,13 @@ private:
   std::vector<std::string> arguments; // command argument
   std::vector<std::string> saved_buffers; // for saving buffer to use upper arrow or down arrow to navigate the saved saved_buffers
   int status;
+  fs::path current_dir;
 
   // umap of string : functioncall that accepts vector of strings e.g: ls -a
   std::unordered_map<std::string, CommandFunctions> shell_functions = {
-    {"ls", ListFilesFunctions::ListFiles},
-    {"exit", [this](const std::vector<std::string>&placeholder){status = 0;}}
+    {"mls", ListFilesFunctions::ListFiles},
+    {"exit", [this](const std::vector<std::string>&placeholder){status = 0;}},
+    {"cd", ChangeDirectoryFunctions::ChangeDirectory}
   };
 
   void DisplayHelpInfo()
@@ -62,12 +67,46 @@ private:
     std::cout << "Foo Foe\n";
   }
 
+  void UpdateCurrentDirection()
+  {
+    current_dir = fs::current_path();
+
+    const char *raw_home_dir = std::getenv("HOME");
+
+    if (raw_home_dir)
+    {
+      fs::path home_path = raw_home_dir;
+
+      std::string crr_str = current_dir.string();
+      std::string home_str = home_path.string();
+
+      if (crr_str.find(home_str) == 0)
+      {
+        current_dir = "~" + crr_str.substr(home_str.length());
+      }
+    } 
+  }
+
+  bool CheckIfIsWhiteSpace(const std::string &str)
+  {
+    for (int i = 0; i < str.length(); ++i)
+    {
+      if(!std::isspace(str[i]))
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   void TakeUserInput()
   {
-    std::cout << start_line_symbol << ' ';
+    UpdateCurrentDirection();
+  std::cout << current_dir.string() << ' ' <<start_line_symbol;
     std::getline(std::cin, buffer);
 
-    if (buffer == "")
+    if (buffer == "" || CheckIfIsWhiteSpace(buffer))
     {
       DisplayHelpInfo();
       buffer = "DEQUSA";
@@ -102,10 +141,15 @@ private:
       // [just the command name e.g ls](the command argument e.g -a)
       shell_functions[arguments[0]](arguments);
     }
+    else
+    {
+      TaskManagerFunctions::LaunchProgram(arguments);
+    }
   }
-    
+
   void Listner()
   {
+    
     status = 1; // 1 working 0 exit
     do
     {

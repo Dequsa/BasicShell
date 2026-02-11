@@ -2,15 +2,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 namespace ListFilesFunctions
 {
   void ListFiles(const std::vector<std::string> &args);
 }
 
-namespace ShellCommands
+namespace ChangeDirectoryFunctions 
 {
-  
-
-  void ChangeDirection(const std::vector<std::string> &args);
+  void ChangeDirectory(const std::vector<std::string> &args);
 }

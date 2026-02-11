@@ -1,6 +1,7 @@
 #include "ShellCommands.h"
-#include <filesystem>
+#include <cstdlib>
 #include "Utility.h"
+
 namespace fs = std::filesystem;
 
 namespace ListFilesFunctions
@@ -100,9 +101,58 @@ namespace ListFilesFunctions
     }
   }
 }
-namespace ChangeDirectionFunctions
+namespace ChangeDirectoryFunctions
 {
-  void ChangeDirection(const std::vector<std::string> &args)
+  fs::path ParsePath(const std::vector<std::string> &args)
   {
+
+    fs::path dir;
+
+    if (args.size() == 1)
+    {
+      const char *raw_home_dir = std::getenv("HOME");
+
+      if (!raw_home_dir)
+      {
+        std::cerr << "Critical error: HOME pointer not found. | ShellCommands.cpp";
+        return {};
+      }
+
+      dir = raw_home_dir;
+    }
+    else
+    {
+      dir = args[1];
+    }
+
+    return dir;
+  }
+
+  void HandleChangeDir(const fs::path &dir)
+  {
+    std::error_code err;
+    fs::current_path(dir, err);
+
+    if (err)
+    {
+      std::cerr << "cd failed: " << err.message() << '\n';
+    }
+    else
+    {
+      return;
+    }
+  }
+
+  void ChangeDirectory(const std::vector<std::string> &args)
+  {
+    fs::path dir;
+    dir = ParsePath(args);
+
+    if (dir.empty())
+    {
+      return;
+    }
+
+    HandleChangeDir(dir);
   }
 }
